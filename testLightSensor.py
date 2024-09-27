@@ -1,18 +1,20 @@
 import RPi.GPIO as GPIO
 import time
 
-# Thiết lập GPIO
-GPIO.setmode(GPIO.BOARD)
-channel = 7  # Sử dụng GPIO 17 cho ví dụ
+GPIO.setmode(GPIO.BCM)
 
-GPIO.setup(channel, GPIO.IN)
+# Chọn chân GPIO 17 để phát hiện ngắt
+channel = 17
+GPIO.setup(channel, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-def callback(channel):
-    print("Phát hiện thay đổi trạng thái!")
+# Hàm callback khi phát hiện ngắt
+def my_callback(channel):
+    print("Có sự thay đổi trạng thái!")
 
-GPIO.add_event_detect(channel, GPIO.BOTH, bouncetime=300)
-GPIO.add_event_callback(channel, callback)
+# Thêm phát hiện ngắt (both - phát hiện cả rising và falling edge)
+GPIO.add_event_detect(channel, GPIO.BOTH, callback=my_callback, bouncetime=300)
 
+# Chờ vô hạn để kiểm tra sự kiện
 try:
     while True:
         time.sleep(1)
