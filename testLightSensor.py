@@ -1,22 +1,27 @@
-import RPi.GPIO as GPIO
-import time
+import pigpio  
+import time  
 
-GPIO.setmode(GPIO.BCM)
+# Khởi tạo pigpio  
+pi = pigpio.pi()  
 
-# Chọn chân GPIO 17 để phát hiện ngắt
-channel = 17
-GPIO.setup(channel, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+# Đặt GPIO pin của servo (thay đổi theo pin bạn đã chọn)  
+servo_pin = 18  
 
-# Hàm callback khi phát hiện ngắt
-def my_callback(channel):
-    print("Có sự thay đổi trạng thái!")
+# Hàm để điều khiển servo  
+def set_servo_angle(angle):  
+    pulse_width = (angle * 1000 / 180) + 500  # Tính toán độ rộng xung  
+    pi.set_servo_pulsewidth(servo_pin, pulse_width)  
 
-# Thêm phát hiện ngắt (both - phát hiện cả rising và falling edge)
-GPIO.add_event_detect(channel, GPIO.BOTH, callback=my_callback, bouncetime=300)
-
-# Chờ vô hạn để kiểm tra sự kiện
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    GPIO.cleanup()
+try:  
+    while True:  
+        for angle in range(0, 181, 5):  # Quay từ 0 độ đến 180 độ  
+            set_servo_angle(angle)  
+            time.sleep(0.1)  
+        for angle in range(180, -1, -5):  # Quay từ 180 độ về 0 độ  
+            set_servo_angle(angle)  
+            time.sleep(0.1)  
+except KeyboardInterrupt:  
+    print("Dừng điều khiển servo")  
+    pi.set_servo_pulsewidth(servo_pin, 0)  # Dừng servo  
+finally:  
+    pi.stop()  # Ngắt kết nối pigpio
