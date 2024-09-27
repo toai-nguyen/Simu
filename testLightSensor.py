@@ -3,7 +3,7 @@ import time
 
 # Thiết lập GPIO
 GPIO.setmode(GPIO.BCM)
-channel = 17  # Sử dụng GPIO 17 cho ví dụ
+channel = 4  # Sử dụng GPIO 17 cho ví dụ
 
 GPIO.setup(channel, GPIO.IN)
 
