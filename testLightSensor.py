@@ -1,27 +1,26 @@
-import pigpio  
-import time  
+import RPi.GPIO as GPIO
+import time
 
-# Khởi tạo pigpio  
-pi = pigpio.pi()  
+# Thiết lập chân GPIO
+LIGHT_SENSOR_PIN = 4  
 
-# Đặt GPIO pin của servo (thay đổi theo pin bạn đã chọn)  
-servo_pin = 18  
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LIGHT_SENSOR_PIN, GPIO.IN)
 
-# Hàm để điều khiển servo  
-def set_servo_angle(angle):  
-    pulse_width = (angle * 1000 / 180) + 500  # Tính toán độ rộng xung  
-    pi.set_servo_pulsewidth(servo_pin, pulse_width)  
+try:
+    while True:
+        # Đọc giá trị từ cảm biến ánh sáng
+        if GPIO.input(LIGHT_SENSOR_PIN) == GPIO.LOW:
+            print("Có ánh sáng")
+        else:
+            print("Không có ánh sáng")
+        
+        # Dừng một chút trước khi đọc lần tiếp theo
+        time.sleep(1)
 
-try:  
-    while True:  
-        for angle in range(0, 181, 5):  # Quay từ 0 độ đến 180 độ  
-            set_servo_angle(angle)  
-            time.sleep(0.1)  
-        for angle in range(180, -1, -5):  # Quay từ 180 độ về 0 độ  
-            set_servo_angle(angle)  
-            time.sleep(0.1)  
-except KeyboardInterrupt:  
-    print("Dừng điều khiển servo")  
-    pi.set_servo_pulsewidth(servo_pin, 0)  # Dừng servo  
-finally:  
-    pi.stop()  # Ngắt kết nối pigpio
+except KeyboardInterrupt:
+    print("Dừng chương trình.")
+
+finally:
+    # Dọn dẹp GPIO sau khi kết thúc chương trình
+    GPIO.cleanup()
